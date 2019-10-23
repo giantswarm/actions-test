@@ -12,7 +12,7 @@ jobs:
         GS_FOOBAR: bug,6900249
         GS_ANOTHER: documentation,6900607
       run: |
-        $new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name) # TODO: Support multiple issues
+        new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name) # TODO: Support multiple issues
 
         for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'; do
             label=$echo $envvar | awk -F ',' '{print $1}')
