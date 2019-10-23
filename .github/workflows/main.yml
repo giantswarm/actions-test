@@ -1,0 +1,12 @@
+name: Project Labels
+on:
+  issues:
+    types: [labeled]   # This workflow is triggered when issues are labeled.
+jobs:
+  job:
+    name: Create Project Card
+    runs-on: ubuntu-latest
+    steps:
+    - name: Print issue event payload
+      run: |
+        cat $GITHUB_EVENT_PATH
