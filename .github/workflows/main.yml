@@ -7,6 +7,8 @@ jobs:
     name: Create Project Card
     runs-on: ubuntu-latest
     steps:
-    - name: Print issue event payload
+    - name: Create Project Card for Issue in appropriate Project Column
       run: |
-        cat $GITHUB_EVENT_PATH
+        curl https://api.github.com/projects/columns/6900249/cards \
+        --header 'Accept: application/vnd.github.inertia-preview+json' \
+        --data "{\"content_id\": \"$(cat $GITHUB_EVENT_PATH | jq .issue.id)\", \"content_type\": \"Issue\"}"
