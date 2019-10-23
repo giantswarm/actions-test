@@ -1,15 +1,27 @@
-name: Project Labels
+name: Add Issue to Project When Labeled
 on:
   issues:
     types: [labeled]   # This workflow is triggered when issues are labeled.
 jobs:
   job:
-    name: Create Project Card
+    name: Add Issue to Project When Labeled
     runs-on: ubuntu-latest
     steps:
     - name: Create Project Card for Issue in appropriate Project Column
+      env:
+        GS_FOOBAR: bug,6900249
+        GS_ANOTHER: documentation,6900607
       run: |
-        curl https://api.github.com/projects/columns/6900249/cards \
-        --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-        --header 'Accept: application/vnd.github.inertia-preview+json' \
-        --data "{\"content_id\": $(cat $GITHUB_EVENT_PATH | jq .issue.id), \"content_type\": \"Issue\"}"
+        $new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name) # TODO: Support multiple issues
+
+        for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'; do
+            label=$echo $envvar | awk -F ',' '{print $1}')
+            column_id=$(echo $envvar | awk -F ',' '{print $2}')
+            
+            if [[ "$new_label" == "$label" ]]; then
+                curl https://api.github.com/projects/columns/$column_id/cards \
+                --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+                --header 'Accept: application/vnd.github.inertia-preview+json' \
+                --data "{\"content_id\": $(cat $GITHUB_EVENT_PATH | jq .issue.id), \"content_type\": \"Issue\"}"
+            fi
+        done
