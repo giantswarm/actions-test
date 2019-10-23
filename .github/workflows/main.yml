@@ -15,7 +15,7 @@ jobs:
         new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name) # TODO: Support multiple issues
 
         for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'; do
-            label=$echo $envvar | awk -F ',' '{print $1}')
+            label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
             
             if [[ "$new_label" == "$label" ]]; then
