@@ -12,4 +12,4 @@ jobs:
         curl https://api.github.com/projects/columns/6900249/cards \
         --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
         --header 'Accept: application/vnd.github.inertia-preview+json' \
-        --data "{\"content_id\": \"$(cat $GITHUB_EVENT_PATH | jq .issue.id)\", \"content_type\": \"Issue\"}"
+        --data "{\"content_id\": $(cat $GITHUB_EVENT_PATH | jq .issue.id), \"content_type\": \"Issue\"}"
