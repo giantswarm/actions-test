@@ -1,7 +1,7 @@
 name: Add Issue to Project When Labeled
 on:
   issues:
-    types: [labeled]   # This workflow is triggered when issues are labeled.
+    types: [labeled]
 jobs:
   job:
     name: Add Issue to Project When Labeled
@@ -12,7 +12,7 @@ jobs:
         GS_FOOBAR: bug,6900249
         GS_ANOTHER: documentation,6900607
       run: |
-        new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name) # TODO: Support multiple issues
+        new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name)
 
         for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'; do
             label=$(echo $envvar | awk -F ',' '{print $1}')
@@ -20,8 +20,8 @@ jobs:
             
             if [[ "$new_label" == "$label" ]]; then
                 curl https://api.github.com/projects/columns/$column_id/cards \
-                --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-                --header 'Accept: application/vnd.github.inertia-preview+json' \
-                --data "{\"content_id\": $(cat $GITHUB_EVENT_PATH | jq .issue.id), \"content_type\": \"Issue\"}"
+                    --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+                    --header 'Accept: application/vnd.github.inertia-preview+json' \
+                    --data "{\"content_id\": $(cat $GITHUB_EVENT_PATH | jq .issue.id), \"content_type\": \"Issue\"}"
             fi
         done
