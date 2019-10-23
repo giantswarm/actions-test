@@ -14,7 +14,7 @@ jobs:
       run: |
         new_label=$(cat $GITHUB_EVENT_PATH | jq .issue.labels[0].name)
 
-        for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'; do
+        for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'); do
             label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
             
