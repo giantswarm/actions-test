@@ -18,6 +18,10 @@ jobs:
             label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
             
+            echo $new_label
+            echo $label
+            echo $column_id
+            
             if [[ "$new_label" == "$label" ]]; then
                 curl https://api.github.com/projects/columns/$column_id/cards \
                     --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
