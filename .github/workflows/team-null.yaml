@@ -1,0 +1,23 @@
+name: Remove 'team/null' Label when Team Label Added
+on:
+  issues:
+    types: [labeled]
+jobs:
+  job:
+    # DOCS
+    name: Remove 'team/null' Label when Team Label Added
+    runs-on: ubuntu-latest
+    steps:
+    - name: Remove 'team/null' Label when Team Label Added
+      run: |
+        issue_id=$(cat $GITHUB_EVENT_PATH | jq -r .issue.number)
+        new_label=$(cat $GITHUB_EVENT_PATH | jq -r .label.name)
+
+        echo $issue_id
+        echo $new_label
+
+        if [[ "$new_label" != "team/null" ]] && [[ "$new_label" =~ ^team/ ]]; then
+            curl https://api.github.com/repos/giantswarm/actions-test/issues/$issue_id/labels/team/null \
+                --request DELETE \
+                --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}'
+        fi
