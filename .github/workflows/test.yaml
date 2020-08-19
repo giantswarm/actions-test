@@ -20,7 +20,7 @@ jobs:
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
 
             if [[ "$event_label" == "$label" ]]; then
-                if [[ "$action" == "labeled"]]; then
+                if [[ "$action" == "labeled" ]]; then
                     curl https://api.github.com/projects/columns/$column_id/cards \
                         --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
                         --header 'Accept: application/vnd.github.inertia-preview+json' \
