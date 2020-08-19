@@ -16,6 +16,9 @@ jobs:
         issue_id=$(cat $GITHUB_EVENT_PATH | jq .issue.id)
 
         cat $GITHUB_EVENT_PATH
+        echo $action
+        echo $event_label
+        echo $issue_id
 
         for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'); do
             label=$(echo $envvar | awk -F ',' '{print $1}')
