@@ -24,6 +24,9 @@ jobs:
             label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
 
+            echo $label
+            echo $column_id
+
             if [[ "$event_label" == "$label" ]]; then
                 if [[ "$action" == "labeled" ]]; then
                     curl https://api.github.com/projects/columns/$column_id/cards \
