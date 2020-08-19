@@ -49,8 +49,8 @@ jobs:
                             --header 'Accept: application/vnd.github.inertia-preview+json')
 
                         echo $cards | jq -c '.[]' | while read card; do
-                            $card_id=$(echo $card | jq .id)
-                            $url=$(echo $card | jq -r .content_url)
+                            card_id=$(echo $card | jq .id)
+                            url=$(echo $card | jq -r .content_url)
 
                             if [[ "$issue_url" == "url" ]]; then
                                 curl -X DELETE https://api.github.com/projects/columns/cards/{$card_id} \
