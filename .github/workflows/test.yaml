@@ -60,7 +60,7 @@ jobs:
                                 echo "removing"
 
                                 curl -X DELETE https://api.github.com/projects/columns/cards/{$card_id} \
-                                    --header "Authorization: Bearer $OPSCTL_GITHUB_TOKEN" \
+                                    --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
                                     --header 'Accept: application/vnd.github.inertia-preview+json'
                             fi
                         done
