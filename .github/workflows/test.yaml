@@ -15,6 +15,8 @@ jobs:
         event_label=$(cat $GITHUB_EVENT_PATH | jq -r .label.name)
         issue_id=$(cat $GITHUB_EVENT_PATH | jq .issue.id)
 
+        echo $action $event_label $issue_id
+
         for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'); do
             label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
@@ -28,19 +30,27 @@ jobs:
                 fi
 
                 if [[ "$action" == "unlabeled" ]]; then
-                    column=$(curl https://api.github.com/projects/$(echo $column | jq -r .)/columns \
+                    project_column=$(curl -Ss https://api.github.com/projects/columns/$column_id \
                         --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
                         --header 'Accept: application/vnd.github.inertia-preview+json')
 
-                    project=$(curl $(echo $column | jq -r .project_url) \
+                    project_id=$(echo $project_column | jq -r .project_url | awk -F '/' '{print $5}')
+
+                    project_columns=$(curl -Ss https://api.github.com/projects/$project_id/columns \
                         --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
                         --header 'Accept: application/vnd.github.inertia-preview+json')
 
-                    columns=$(curl https://api.github.com/projects/$(echo $project | jq -r .id)/columns \
-                        --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
-                        --header 'Accept: application/vnd.github.inertia-preview+json')
+                    echo $project_columns | jq -c '.[]' | while read c; do
+                        cards_url=$(echo $c | jq -r .cards_url)
 
-                    echo $columns
+                        cards=$(curl -Ss $cards_url \
+                            --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
+                            --header 'Accept: application/vnd.github.inertia-preview+json')
+
+                        echo $cards | jq -c '.[]' | while read card; do
+                            echo $card
+                        done
+                    done
                 fi
             fi
         done
