@@ -15,26 +15,32 @@ jobs:
         event_label=$(cat $GITHUB_EVENT_PATH | jq -r .label.name)
         issue_id=$(cat $GITHUB_EVENT_PATH | jq .issue.id)
 
-        cat $GITHUB_EVENT_PATH
-        echo $action
-        echo $event_label
-        echo $issue_id
-
         for envvar in $(env | grep GS_ | awk -F '=' '{print $2}'); do
             label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
 
-            echo $label
-            echo $column_id
-
             if [[ "$event_label" == "$label" ]]; then
                 if [[ "$action" == "labeled" ]]; then
-                    echo "boo"
-
                     curl https://api.github.com/projects/columns/$column_id/cards \
                         --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
                         --header 'Accept: application/vnd.github.inertia-preview+json' \
                         --data "{\"content_id\": $issue_id, \"content_type\": \"Issue\"}"
+                fi
+
+                if [[ "$action" == "unlabeled" ]]; then
+                    column=$(curl https://api.github.com/projects/$(echo $column | jq -r .)/columns \
+                        --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
+                        --header 'Accept: application/vnd.github.inertia-preview+json')
+
+                    project=$(curl $(echo $column | jq -r .project_url) \
+                        --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
+                        --header 'Accept: application/vnd.github.inertia-preview+json')
+
+                    columns=$(curl https://api.github.com/projects/$(echo $project | jq -r .id)/columns \
+                        --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
+                        --header 'Accept: application/vnd.github.inertia-preview+json')
+
+                    echo $columns
                 fi
             fi
         done
