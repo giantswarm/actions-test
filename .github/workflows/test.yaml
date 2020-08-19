@@ -29,6 +29,8 @@ jobs:
 
             if [[ "$event_label" == "$label" ]]; then
                 if [[ "$action" == "labeled" ]]; then
+                    echo "boo"
+
                     curl https://api.github.com/projects/columns/$column_id/cards \
                         --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
                         --header 'Accept: application/vnd.github.inertia-preview+json' \
