@@ -22,6 +22,8 @@ jobs:
             label=$(echo $envvar | awk -F ',' '{print $1}')
             column_id=$(echo $envvar | awk -F ',' '{print $2}')
 
+            echo $label $column_id
+
             if [[ "$event_label" == "$label" ]]; then
                 if [[ "$action" == "labeled" ]]; then
                     curl https://api.github.com/projects/columns/$column_id/cards \
@@ -52,9 +54,13 @@ jobs:
                             card_id=$(echo $card | jq .id)
                             url=$(echo $card | jq -r .content_url)
 
-                            if [[ "$issue_url" == "url" ]]; then
+                            echo $card_id $url
+
+                            if [[ "$issue_url" == "$url" ]]; then
+                                echo "removing"
+
                                 curl -X DELETE https://api.github.com/projects/columns/cards/{$card_id} \
-                                    --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
+                                    --header "Authorization: Bearer $OPSCTL_GITHUB_TOKEN" \
                                     --header 'Accept: application/vnd.github.inertia-preview+json'
                             fi
                         done
