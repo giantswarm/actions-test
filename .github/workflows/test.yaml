@@ -14,7 +14,7 @@ jobs:
         action=$(cat $GITHUB_EVENT_PATH | jq -r .action)
         event_label=$(cat $GITHUB_EVENT_PATH | jq -r .label.name)
         issue_id=$(cat $GITHUB_EVENT_PATH | jq .issue.id)
-        issue_url=$(cat $GITHUB_EVENT_PATH | jq .issue.url)
+        issue_url=$(cat $GITHUB_EVENT_PATH | jq -r .issue.url)
 
         echo $action $event_label $issue_id $issue_url
 
@@ -49,7 +49,14 @@ jobs:
                             --header 'Accept: application/vnd.github.inertia-preview+json')
 
                         echo $cards | jq -c '.[]' | while read card; do
-                            echo $card
+                            $card_id=$(echo $card | jq .id)
+                            $url=$(echo $card | jq -r .content_url)
+
+                            if [[ "$issue_url" == "url" ]]; then
+                                curl -X DELETE https://api.github.com/projects/columns/cards/{$card_id} \
+                                    --header 'authorization: Bearer ${{ secrets.LABEL_PROJECT_TOKEN }}' \
+                                    --header 'Accept: application/vnd.github.inertia-preview+json'
+                            fi
                         done
                     done
                 fi
