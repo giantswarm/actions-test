@@ -1,0 +1,14 @@
+version: 2.1
+
+orbs:
+  architect: giantswarm/architect@4.0.0
+
+workflows:
+  build:
+    jobs:
+      - architect/go-build:
+          name: go-build
+          binary: actions-test
+          filters:
+            tags:
+              only: /^v.*/
