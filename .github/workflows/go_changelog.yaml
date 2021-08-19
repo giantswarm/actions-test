@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: mkdir
+        run: mkdir -p /github/workspace/.changelog
+        
       - name: Check PR body
         run: /go-changelog/changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path /github/workspace/.changelog
 
