@@ -23,8 +23,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: changelog
-          path: .changelog/${{ github.event.number }}.txt
-          if-no-files-found: ignore
+          path: .changelog
 
   commit-changes:
     runs-on: ubuntu-latest
