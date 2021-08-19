@@ -14,9 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: mkdir
-        run: mkdir -p /github/workspace/.changelog
-
       - name: Check PR body
         run: /go-changelog/changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path /github/workspace/.changelog
         env:
@@ -26,7 +23,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: changelog
-          path: /github/workspace/.changelog
+          path: .changelog/${{ github.event.number }}.txt
+          if-no-files-found: ignore
 
   commit-changes:
     runs-on: ubuntu-latest
@@ -38,7 +36,7 @@ jobs:
       - name: Download changelog directory
         uses: actions/download-artifact@v2
         with:
-          name: changelog
+          path: .changelog
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
