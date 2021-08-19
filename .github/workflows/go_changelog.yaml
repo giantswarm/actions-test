@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: docker://giantswarm/go-changelog
+      volumes:
+        - ${{ github.workspace }}:/github/workspace
     steps:
       - uses: actions/checkout@v2
 
