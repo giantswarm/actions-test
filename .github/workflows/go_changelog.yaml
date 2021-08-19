@@ -19,6 +19,8 @@ jobs:
 
       - name: Check PR body
         run: /go-changelog/changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path /github/workspace/.changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload changelog directory
         uses: actions/upload-artifact@v2
