@@ -36,6 +36,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: .changelog
+          name: changelog
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:

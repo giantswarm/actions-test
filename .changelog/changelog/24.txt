@@ -1,3 +1,0 @@
-```release-note:bug
-Put changelogs in the correct directory.
-```
