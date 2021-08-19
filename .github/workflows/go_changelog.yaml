@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Check PR body
-        run: ./changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path .changelog
+        run: /go-changelog/changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path .changelog
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
