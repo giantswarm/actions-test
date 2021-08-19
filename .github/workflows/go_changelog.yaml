@@ -1,0 +1,22 @@
+name: Check and update changelog
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  go-changelog:
+    runs-on: ubuntu-latest
+    container:
+      image: docker://giantswarm/go-changelog
+      volumes:
+        - ${{ github.workspace }}/.changelog:/go-changelog/.changelog
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check PR body
+        run: ./changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path .changelog
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply go-changelog changes
