@@ -9,13 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: docker://giantswarm/go-changelog
-      volumes:
-        - ${{ github.workspace }}/.changelog:/go-changelog/.changelog
     steps:
       - uses: actions/checkout@v2
 
       - name: Check PR body
-        run: /go-changelog/changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path /go-changelog/.changelog
+        run: /go-changelog/changelog-pr-body-check -pull-request ${{ github.event.number }} -output-path ${{ github.workspace }}/.changelog
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
