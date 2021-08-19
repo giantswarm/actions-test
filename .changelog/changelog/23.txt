@@ -1,0 +1,7 @@
+```release-note:enhancement
+Change project description to be even more exciting.
+```
+
+```release-note:feature
+But now it shouldn't.
+```
