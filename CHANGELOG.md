@@ -1,1 +1,14 @@
-FEATURES: CHANGELOG.md Dockerfile Makefile Makefile.gen.go.mk README.md go.mod go.sum main.go pkg But now it shouldn't. ([GH-23]) CHANGELOG.md Dockerfile Makefile Makefile.gen.go.mk README.md go.mod go.sum main.go pkg Something else. ([GH-24]) IMPROVEMENTS: CHANGELOG.md Dockerfile Makefile Makefile.gen.go.mk README.md go.mod go.sum main.go pkg Change project description to be even more exciting. ([GH-23]) BUG FIXES: CHANGELOG.md Dockerfile Makefile Makefile.gen.go.mk README.md go.mod go.sum main.go pkg Put changelogs in the correct directory. ([GH-24])
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- Add test binary and project skeleton.
+
+[Unreleased]: https://github.com/giantswarm/actions-test/tree/main
