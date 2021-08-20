@@ -158,6 +158,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Delete old changelog
+        run: rm CHANGELOG.md
+
       - name: Download changelog
         uses: actions/download-artifact@v2
         with:
