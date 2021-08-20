@@ -90,8 +90,8 @@ jobs:
             -entries-dir .changelog \
             -note-template /go-changelog/release-note.tmpl \
             -changelog-template /go-changelog/changelog.tmpl)
-          echo "body=\"body\""
-          echo $body > CHANGELOG.md
+          echo "body=\"$body\""
+          echo "$body" > CHANGELOG.md
           echo "::set-output name=body::${body}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
