@@ -84,7 +84,7 @@ jobs:
         id: build_changelog
         run: |
           body=$(/go-changelog/changelog-build \
-            -last-release "${{ needs.gather_facts.outputs.previous }}" \
+            -last-release "v${{ needs.gather_facts.outputs.previous }}" \
             -this-release "${{ needs.gather_facts.outputs.head }}" \
             -git-dir . \
             -entries-dir .changelog \
