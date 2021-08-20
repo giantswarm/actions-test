@@ -113,6 +113,7 @@ jobs:
     needs:
       - gather_facts
       - go_changelog
+      - commit-changes
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
     env:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ github.event.repository.name }}"
