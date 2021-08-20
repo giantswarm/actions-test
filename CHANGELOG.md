@@ -1,14 +1,10 @@
-# Changelog
 
-All notable changes to this project will be documented in this file.
+FEATURES:
+* But now it shouldn't. ([GH-23])
+* Something else. ([GH-24])
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+IMPROVEMENTS:
+* Change project description to be even more exciting. ([GH-23])
 
-## [Unreleased]
-
-### Added
-
-- Add test binary and project skeleton.
-
-[Unreleased]: https://github.com/giantswarm/actions-test/tree/main
+BUG FIXES:
+* Put changelogs in the correct directory. ([GH-24])
