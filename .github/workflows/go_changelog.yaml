@@ -8,7 +8,7 @@ jobs:
   go-changelog:
     runs-on: ubuntu-latest
     container:
-      image: docker://giantswarm/go-changelog
+      image: docker://giantswarm/go-changelog:0.0.0-71d2482c3c35efbc263202bb6372b3026a2857e4
       volumes:
         - ${{ github.workspace }}:/github/workspace
     steps:

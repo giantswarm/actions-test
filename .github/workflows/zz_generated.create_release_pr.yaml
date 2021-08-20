@@ -70,7 +70,7 @@ jobs:
     outputs:
       body: ${{ steps.build_changelog.outputs.body }}
     container:
-      image: docker://giantswarm/go-changelog:0.0.0-f1d901185ab0f5a1054f1e40a83264034c02b317
+      image: docker://giantswarm/go-changelog:0.0.0-71d2482c3c35efbc263202bb6372b3026a2857e4
       volumes:
         - ${{ github.workspace }}:/github/workspace
     needs:
@@ -146,7 +146,10 @@ jobs:
           version: "${{ needs.gather_facts.outputs.version }}"
           body: "${{ needs.gather_facts.outputs.version }}"
         run: |
-          hub pull-request -f  -m "Release v${{ env.version }}\n\n${{ needs.go_changelog.outputs.body }}" -a ${{ github.actor }} -b ${{ env.base }} -h ${{ github.event.ref }}
+          echo "Release v${{ env.version }}\n\n" > release.txt
+          echo "${{ needs.go_changelog.outputs.body }}" >> release.txt
+          echo "```release-note:none\n```" >> release.txt
+          hub pull-request -f  -F release.txt -a ${{ github.actor }} -b ${{ env.base }} -h ${{ github.event.ref }}
 
   commit-changes:
     runs-on: ubuntu-latest
