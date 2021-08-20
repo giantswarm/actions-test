@@ -90,6 +90,7 @@ jobs:
             -entries-dir .changelog \
             -note-template /go-changelog/release-note.tmpl \
             -changelog-template /go-changelog/changelog.tmpl)
+          echo "body=\"body\""
           echo $body > CHANGELOG.md
           echo "::set-output name=body::${body}"
         env:
@@ -147,7 +148,7 @@ jobs:
           version: "${{ needs.gather_facts.outputs.version }}"
           body: "${{ needs.gather_facts.outputs.version }}"
         run: |
-          echo "Release v${{ env.version }}\n\n" > release.txt
+          echo "Release v${{ env.version }}" > release.txt
           echo "" >> release.txt
           echo "" >> release.txt
           echo "${{ needs.go_changelog.outputs.body }}" >> release.txt
@@ -177,3 +178,4 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Apply go-changelog changes
+          push_options: '--force'
