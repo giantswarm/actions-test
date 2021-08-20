@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       base: ${{ steps.gather_facts.outputs.base }}
+      head: ${{ steps.gather_facts.outputs.head }}
       skip: ${{ steps.pr_exists.outputs.skip }}
       version: ${{ steps.gather_facts.outputs.version }}
       previous: ${{ steps.gather_facts.outputs.previous }}
