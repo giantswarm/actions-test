@@ -148,8 +148,11 @@ jobs:
           body: "${{ needs.gather_facts.outputs.version }}"
         run: |
           echo "Release v${{ env.version }}\n\n" > release.txt
+          echo "" >> release.txt
+          echo "" >> release.txt
           echo "${{ needs.go_changelog.outputs.body }}" >> release.txt
-          echo "```release-note:none\n```" >> release.txt
+          echo "```release-note:none" >> release.txt
+          echo "```" >> release.txt
           hub pull-request -f  -F release.txt -a ${{ github.actor }} -b ${{ env.base }} -h ${{ github.event.ref }}
 
   commit-changes:
