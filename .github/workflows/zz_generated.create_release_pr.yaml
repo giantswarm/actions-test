@@ -70,7 +70,7 @@ jobs:
     outputs:
       base: ${{ steps.build_changelog.outputs.body }}
     container:
-      image: docker://giantswarm/go-changelog:0.0.0-d10a69b050635fbbd620d6e623da846f3d48518c
+      image: docker://giantswarm/go-changelog:0.0.0-f1d901185ab0f5a1054f1e40a83264034c02b317
       volumes:
         - ${{ github.workspace }}:/github/workspace
     needs:
