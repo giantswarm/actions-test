@@ -68,7 +68,7 @@ jobs:
   go_changelog:
     runs-on: ubuntu-latest
     outputs:
-      body: ${{ steps.build_changelog.outputs.body }}
+      body: ${{ steps.go_changelog.outputs.body }}
     container:
       image: docker://giantswarm/go-changelog:0.0.0-71d2482c3c35efbc263202bb6372b3026a2857e4
       volumes:
@@ -81,17 +81,19 @@ jobs:
           fetch-depth: 0
 
       - name: Build changelog
-        id: build_changelog
+        id: go_changelog
         run: |
-          body=$(/go-changelog/changelog-build \
+          body="$(/go-changelog/changelog-build \
             -last-release "v${{ needs.gather_facts.outputs.previous }}" \
             -this-release "${{ needs.gather_facts.outputs.head }}" \
             -git-dir . \
             -entries-dir .changelog \
             -note-template /go-changelog/release-note.tmpl \
-            -changelog-template /go-changelog/changelog.tmpl)
-          echo "body=\"$body\""
+            -changelog-template /go-changelog/changelog.tmpl)"
           echo "$body" > CHANGELOG.md
+          body="${body//'%'/%25}"
+          body="${body//$'\n'/%0A}"
+          body="${body//$'\r'/%0D}"
           echo "::set-output name=body::${body}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
