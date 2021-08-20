@@ -31,6 +31,9 @@ jobs:
       version: ${{ steps.gather_facts.outputs.version }}
       previous: ${{ steps.gather_facts.outputs.previous }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Gather facts
         id: gather_facts
         run: |
@@ -67,6 +70,8 @@ jobs:
       image: docker://giantswarm/go-changelog
       volumes:
         - ${{ github.workspace }}:/github/workspace
+    needs:
+      - gather_facts
     steps:
       - uses: actions/checkout@v2
 
