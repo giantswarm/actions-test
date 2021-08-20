@@ -29,6 +29,7 @@ jobs:
       base: ${{ steps.gather_facts.outputs.base }}
       skip: ${{ steps.pr_exists.outputs.skip }}
       version: ${{ steps.gather_facts.outputs.version }}
+      previous: ${{ steps.gather_facts.outputs.previous }}
     steps:
       - name: Gather facts
         id: gather_facts
@@ -39,10 +40,13 @@ jobs:
           base="${base#refs/heads/}" # Strip "refs/heads/" prefix.
           version="$(echo $head | cut -d '#' -f 3)"
           version="${version#v}" # Strip "v" prefix.
-          echo "base=\"$base\" head=\"$head\" version=\"$version\""
+          previous="$(git describe --abbrev=0)"
+          previous="${previous#v}" # Strip "v" prefix.
+          echo "base=\"$base\" head=\"$head\" version=\"$version\" previous=\"$previous\""
           echo "::set-output name=base::${base}"
           echo "::set-output name=head::${head}"
           echo "::set-output name=version::${version}"
+          echo "::set-output name=previous::${previous}"
       - name: Check if PR exists
         id: pr_exists
         env:
@@ -54,11 +58,50 @@ jobs:
           else
             echo "::set-output name=skip::false"
           fi
+
+  go_changelog:
+    runs-on: ubuntu-latest
+    outputs:
+      base: ${{ steps.build_changelog.outputs.body }}
+    container:
+      image: docker://giantswarm/go-changelog
+      volumes:
+        - ${{ github.workspace }}:/github/workspace
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build changelog
+        id: build_changelog
+        run: |
+          body=$(/go-changelog/changelog-build \
+            -last-release "${{ needs.gather_facts.outputs.previous }}" \
+            -this-release "${{ env.GITHUB_HEAD_REF }}" \
+            -git-dir . \
+            -entries-dir .changelog \
+            -note-template /go-changelog/release-note.tmpl \
+            -changelog-template /go-changelog/changelog.tmpl)
+          echo "::set-output name=body::${body}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload changelog
+        uses: actions/upload-artifact@v2
+        with:
+          name: changelog
+          path: CHANGELOG.md
+
+      - name: Upload changelog directory
+        uses: actions/upload-artifact@v2
+        with:
+          name: changelog-directory
+          path: .changelog
+
   create_release_pr:
     name: Create release PR
     runs-on: ubuntu-20.04
     needs:
       - gather_facts
+      - go_changelog
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
     env:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ github.event.repository.name }}"
@@ -91,5 +134,29 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           base: "${{ needs.gather_facts.outputs.base }}"
           version: "${{ needs.gather_facts.outputs.version }}"
+          body: "${{ needs.gather_facts.outputs.version }}"
         run: |
-          hub pull-request -f  -m "Release v${{ env.version }}" -a ${{ github.actor }} -b ${{ env.base }} -h ${{ github.event.ref }}
+          hub pull-request -f  -m "Release v${{ env.version }}\n\n${{ needs.go_changelog.outputs.body }}" -a ${{ github.actor }} -b ${{ env.base }} -h ${{ github.event.ref }}
+
+  commit-changes:
+    runs-on: ubuntu-latest
+    needs: [go-changelog]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download changelog
+        uses: actions/download-artifact@v2
+        with:
+          path: CHANGELOG.md
+          name: changelog
+
+      - name: Download changelog directory
+        uses: actions/download-artifact@v2
+        with:
+          path: .changelog
+          name: changelog-directory
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply go-changelog changes
