@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - gather_facts
-    if: !contains(github.head_ref, '#release#')
+    if: "!contains(github.head_ref, '#release#')"
     container:
       image: docker://giantswarm/go-changelog:0.0.0-1cc37556d1acbd1e079a146338b84c2ab9b7d9a4
       volumes:
