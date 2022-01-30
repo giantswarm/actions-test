@@ -13,11 +13,12 @@ jobs:
       volumes:
         - ${{ github.workspace }}:/github/workspace
     outputs:
-      skip: ${{ steps.gather_facts.outputs.skip }}
+      skip: ${{ steps.check.outputs.skip }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Check PR body
+        id: check
         run: |
           head="${{ github.event.pull_request.head.ref }}"
           if [[ "$head" =~ "^.+#release#.+" ]]; then
