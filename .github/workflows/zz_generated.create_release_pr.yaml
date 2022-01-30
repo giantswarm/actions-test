@@ -117,10 +117,10 @@ jobs:
       id: build_changelog
       run: |
         changelog=$(/go-changelog/changelog-build \
-          -changelog-template changelog.tmpl \
+          -changelog-template /go-changelog/changelog.tmpl \
           -entries-dir .changelog \
           -last-release ${{ needs.gather_facts.outputs.base }} \
-          -note-template release-note.tmpl \
+          -note-template /go-changelog/release-note.tmpl \
           -this-release HEAD \
           -git-dir /github/workspace)
         echo "::set-output name=changelog::${changelog}"
