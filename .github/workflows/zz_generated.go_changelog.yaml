@@ -3,37 +3,14 @@ name: Check and update changelog
 on:
   pull_request:
     types: [opened, edited]
+  branches-ignore:
+    - master
+    - main
+    - 'release-v*.*.x'
+    # "!" negates previous positive patterns so it has to be at the end.
+    - '!release-v*.x.x'
 
 jobs:
-  debug_info:
-    name: Debug info
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Print github context JSON
-        run: |
-          cat <<EOF
-          ${{ toJson(github) }}
-          EOF
-
-  gather_facts:
-    name: Gather facts
-    runs-on: ubuntu-20.04
-    outputs:
-      skip: ${{ steps.gather_facts.outputs.skip }}
-    steps:
-      - name: Gather facts
-        id: gather_facts
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        run: |
-          head="${GITHUB_REF#refs/heads/}" # Strip "refs/heads/" prefix.
-          echo $head
-          if [[ "$head" =~ "^.*#release#.*" ]]; then
-            echo "::set-output name=skip::true"
-          else
-            echo "::set-output name=skip::false"
-          fi
-
   go-changelog:
     runs-on: ubuntu-latest
     needs:
