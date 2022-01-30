@@ -92,7 +92,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
-          if gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }} | grep -i 'state:[[:space:]]*open' >/dev/null; then
+          if gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }} --json state | grep -i '"state":"OPEN"' >/dev/null; then
             gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }}
             echo "::set-output name=skip::true"
           else
@@ -170,7 +170,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
           git add -A
-          git rm .changelog/*.txt
+          git rm .changelog/*.txt --ignore-unmatch
           git commit -m "Release v${{ env.version }}"
       - name: Push changes
         env:
