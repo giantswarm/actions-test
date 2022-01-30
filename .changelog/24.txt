@@ -1,0 +1,7 @@
+```release-note:bug
+Put changelogs in the correct directory.
+```
+
+```release-note:feature
+Something else.
+```
