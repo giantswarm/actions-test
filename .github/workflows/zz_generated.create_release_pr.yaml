@@ -166,8 +166,6 @@ jobs:
           remote_repo: "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
         run: |
           git push "${remote_repo}" HEAD:${{ needs.gather_facts.outputs.branch }}
-      - name: Install hub cli
-        uses: geertvdc/setup-hub@master
       - name: Create PR
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -176,9 +174,9 @@ jobs:
           changelog: "${{ needs.build_changelog.outputs.changelog }}"
           version: "${{ needs.gather_facts.outputs.version }}"
         run: |
-          hub pull-request -f \
-            -m "Release v${{ env.version }}" \
-            -m "${{ env.changelog }}" \
+          gh pr create \
+            -t "Release v${{ env.version }}" \
+            -b "${{ env.changelog }}" \
             -a "${{ github.actor }}" \
-            -b "${{ env.base }}" \
-            -h "${{ env.branch }}"
+            -B "${{ env.base }}" \
+            -H "${{ env.branch }}"
