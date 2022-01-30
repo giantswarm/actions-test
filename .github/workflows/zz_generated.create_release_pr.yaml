@@ -40,6 +40,7 @@ jobs:
       repo_name: ${{ steps.gather_facts.outputs.repo_name }}
       branch: ${{ steps.gather_facts.outputs.branch }}
       base: ${{ steps.gather_facts.outputs.base }}
+      parent_version: ${{ steps.gather_facts.outputs.parent_version }}
       skip: ${{ steps.pr_exists.outputs.skip }}
       version: ${{ steps.gather_facts.outputs.version }}
     steps:
@@ -91,7 +92,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
-          if gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }} | grep -i 'state:[[:space:]]*open' >/dev/null; then
+          if gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }} --json state | grep -i '"state":"OPEN"' >/dev/null; then
             gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }}
             echo "::set-output name=skip::true"
           else
@@ -112,35 +113,44 @@ jobs:
       changelog: ${{ steps.build_changelog.outputs.changelog }}
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Build changelog
       id: build_changelog
       run: |
-        changelog=$(/go-changelog/changelog-build \
-          -changelog-template changelog.tmpl \
+        parent_version="$(git describe --tags --abbrev=0 HEAD^ || true)"
+        /go-changelog/changelog-build \
+          -changelog-template /go-changelog/changelog.tmpl \
           -entries-dir .changelog \
-          -last-release ${{ needs.gather_facts.outputs.base }} \
-          -note-template release-note.tmpl \
+          -last-release ${parent_version} \
+          -note-template /go-changelog/release-note.tmpl \
           -this-release HEAD \
-          -git-dir /github/workspace)
-        echo "::set-output name=changelog::${changelog}"
+          -git-dir /github/workspace > .changelog/v${{ needs.gather_facts.outputs.version }}.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload generated changelog
+      uses: actions/upload-artifact@v2
+      with:
+        name: changelog
+        path: .changelog
 
   create_release_pr:
     name: Create release PR
     runs-on: ubuntu-20.04
     needs:
       - build_changelog
+      - gather_facts
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
     env:
-      architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }} --update-changelog=false"
+      architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }}"
     steps:
       - name: Install architect
         uses: giantswarm/install-binary-action@v1.0.0
         with:
           binary: "architect"
-          version: "5.3.0-a07ef6dbd5d6657799767b0ef07ced74880967a4"
+          version: "5.3.0"
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -148,6 +158,11 @@ jobs:
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
+      - name: Download generated changelog
+        uses: actions/download-artifact@v2
+        with:
+          path: .changelog
+          name: changelog
       - name: Create release commit
         env:
           version: "${{ needs.gather_facts.outputs.version }}"
@@ -155,6 +170,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
           git add -A
+          git rm .changelog/*.txt --ignore-unmatch
           git commit -m "Release v${{ env.version }}"
       - name: Push changes
         env:
@@ -165,13 +181,14 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           base: "${{ needs.gather_facts.outputs.base }}"
-          branch: "${{ needs.gather_facts.outputs.base }}"
+          branch: "${{ needs.gather_facts.outputs.branch }}"
           changelog: "${{ needs.build_changelog.outputs.changelog }}"
           version: "${{ needs.gather_facts.outputs.version }}"
         run: |
-          hub pull-request -f \
-            -m "Release v${{ env.version }}" \
-            -m "${{ env.changelog }}" \
+          gh pr create \
+            --draft \
+            -t "Release v${{ env.version }}" \
+            -F .changelog/v${{ needs.gather_facts.outputs.version }}.md \
             -a "${{ github.actor }}" \
-            -b "${{ env.base }}" \
-            -h "${{ env.branch }}"
+            -B "${{ env.base }}" \
+            -H "${{ env.branch }}"
