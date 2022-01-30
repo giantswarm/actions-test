@@ -1,7 +1,7 @@
 package project
 
 var (
-	description = "Minimal binary for testing GitHub Actions?"
+	description = "Minimal binary for testing GitHub Actions!"
 	gitSHA      = "n/a"
 	name        = "actions-test"
 	source      = "https://github.com/giantswarm/actions-test"
