@@ -27,7 +27,6 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           head="${{ github.event.pull_request.head.ref }}"
-          head="${head#refs/heads/}" # Strip "refs/heads/" prefix.
           echo $head
           if [[ "$head" =~ "^.*#release#.*" ]]; then
             echo "::set-output name=skip::true"
