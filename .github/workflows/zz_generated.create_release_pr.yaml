@@ -126,8 +126,7 @@ jobs:
           -last-release ${parent_version} \
           -note-template /go-changelog/release-note.tmpl \
           -this-release HEAD \
-          -git-dir /github/workspace > .changelog/${{ needs.gather_facts.outputs.version }}.md
-        rm .changelog/*.txt
+          -git-dir /github/workspace > .changelog/v${{ needs.gather_facts.outputs.version }}.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -171,6 +170,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
           git add -A
+          git rm .changelog/*.txt
           git commit -m "Release v${{ env.version }}"
       - name: Push changes
         env:
@@ -188,7 +188,7 @@ jobs:
           gh pr create \
             --draft \
             -t "Release v${{ env.version }}" \
-            -F .changelog/${{ needs.gather_facts.outputs.version }}.md \
+            -F .changelog/v${{ needs.gather_facts.outputs.version }}.md \
             -a "${{ github.actor }}" \
             -B "${{ env.base }}" \
             -H "${{ env.branch }}"
