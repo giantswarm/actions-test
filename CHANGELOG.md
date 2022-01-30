@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2022-01-30
+
 ### Added
 
 - Add test binary and project skeleton.
 
-[Unreleased]: https://github.com/giantswarm/actions-test/tree/main
+[Unreleased]: https://github.com/giantswarm/giantswarm/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/giantswarm/giantswarm/releases/tag/v0.1.0
