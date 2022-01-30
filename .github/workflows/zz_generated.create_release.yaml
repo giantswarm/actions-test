@@ -82,35 +82,6 @@ jobs:
           fi
           echo "refversion =\"${refversion}\""
           echo "::set-output name=refversion::${refversion}"
-  
-  build_changelog:
-    name: Build changelog
-    runs-on: ubuntu-latest
-    if: ${{ needs.gather_facts.outputs.version }}
-    needs:
-      - gather_facts
-    container:
-      image: docker://giantswarm/go-changelog:0.0.0-1cc37556d1acbd1e079a146338b84c2ab9b7d9a4
-      volumes:
-        - ${{ github.workspace }}:/github/workspace
-    outputs:
-      changelog: ${{ steps.build_changelog.outputs.changelog }}
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Build changelog
-      id: build_changelog
-      run: |
-        changelog=$(/go-changelog/changelog-build \
-          -changelog-template changelog.tmpl \
-          -entries-dir .changelog \
-          -last-release ${{ needs.gather_facts.outputs.base }} \
-          -note-template release-note.tmpl \
-          -this-release HEAD \
-          -git-dir /github/workspace)
-        echo "::set-output name=changelog::${changelog}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   update_project_go:
     name: Update project.go
@@ -167,6 +138,7 @@ jobs:
           title: "Bump version to ${{ steps.update_project_go.outputs.new_version }}"
         run: |
           hub pull-request -f  -m "${{ env.title }}" -b ${{ env.base }} -h ${{ env.branch }} -r ${{ github.actor }}
+
   create_release:
     name: Create release
     runs-on: ubuntu-20.04
@@ -208,7 +180,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: ${{ needs.build_changelog.outputs.changelog }}
+          body_path: .changelog/v${{ needs.build_changelog.outputs.changelog }}.md
           tag_name: "v${{ needs.gather_facts.outputs.version }}"
           release_name: "v${{ needs.gather_facts.outputs.version }}"
 
