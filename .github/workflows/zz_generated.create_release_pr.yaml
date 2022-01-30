@@ -120,7 +120,6 @@ jobs:
       id: build_changelog
       run: |
         parent_version="$(git describe --tags --abbrev=0 HEAD^ || true)"
-        echo ${parent_version}
         changelog=$(/go-changelog/changelog-build \
           -changelog-template /go-changelog/changelog.tmpl \
           -entries-dir .changelog \
@@ -128,9 +127,15 @@ jobs:
           -note-template /go-changelog/release-note.tmpl \
           -this-release HEAD \
           -git-dir /github/workspace)
-        echo "::set-output name=changelog::${changelog}"
+        echo ${changelog} > .changelog/${{ needs.gather_facts.outputs.version }}.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload generated changelog
+      uses: actions/upload-artifact@v2
+      with:
+        name: changelog
+        path: .changelog/${{ needs.gather_facts.outputs.version }}.md
 
   create_release_pr:
     name: Create release PR
@@ -154,6 +159,11 @@ jobs:
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
+      - name: Download generated changelog
+        uses: actions/download-artifact@v2
+        with:
+          path: .changelog/${{ needs.gather_facts.outputs.version }}.md
+          name: changelog
       - name: Create release commit
         env:
           version: "${{ needs.gather_facts.outputs.version }}"
@@ -161,6 +171,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
           git add -A
+          git rm .changelog/*.txt
           git commit -m "Release v${{ env.version }}"
       - name: Push changes
         env:
@@ -176,8 +187,9 @@ jobs:
           version: "${{ needs.gather_facts.outputs.version }}"
         run: |
           gh pr create \
+            --draft \
             -t "Release v${{ env.version }}" \
-            -b "${{ env.changelog }}" \
+            -F .changelog/${{ needs.gather_facts.outputs.version }}.md \
             -a "${{ github.actor }}" \
             -B "${{ env.base }}" \
             -H "${{ env.branch }}"
