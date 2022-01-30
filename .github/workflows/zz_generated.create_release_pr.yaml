@@ -116,10 +116,11 @@ jobs:
     - name: Build changelog
       id: build_changelog
       run: |
+        parent_version="$(git describe --tags --abbrev=0 HEAD^ || true)"
         changelog=$(/go-changelog/changelog-build \
           -changelog-template /go-changelog/changelog.tmpl \
           -entries-dir .changelog \
-          -last-release ${{ needs.gather_facts.outputs.base }} \
+          -last-release ${parent_version} \
           -note-template /go-changelog/release-note.tmpl \
           -this-release HEAD \
           -git-dir /github/workspace)
@@ -132,6 +133,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - build_changelog
+      - gather_facts
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
     env:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }} --update-changelog=false"
