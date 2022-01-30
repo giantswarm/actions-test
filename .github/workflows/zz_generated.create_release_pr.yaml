@@ -166,6 +166,8 @@ jobs:
           remote_repo: "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
         run: |
           git push "${remote_repo}" HEAD:${{ needs.gather_facts.outputs.branch }}
+      - name: Install hub cli
+        uses: geertvdc/setup-hub@master
       - name: Create PR
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
