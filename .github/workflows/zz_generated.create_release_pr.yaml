@@ -120,6 +120,7 @@ jobs:
       id: build_changelog
       run: |
         parent_version="$(git describe --tags --abbrev=0 HEAD^ || true)"
+        echo ${parent_version}
         changelog=$(/go-changelog/changelog-build \
           -changelog-template /go-changelog/changelog.tmpl \
           -entries-dir .changelog \
@@ -139,7 +140,7 @@ jobs:
       - gather_facts
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
     container:
-      image: docker://giantswarm/architect:5.3.0-a07ef6dbd5d6657799767b0ef07ced74880967a4
+      image: docker://giantswarm/architect:5.3.0-09072f52a7b53b09d58bc867f138709101cf4123
       volumes:
         - ${{ github.workspace }}:/github/workspace
     env:
