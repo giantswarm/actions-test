@@ -139,17 +139,18 @@ jobs:
       - build_changelog
       - gather_facts
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
-    container:
-      image: docker://quay.io/giantswarm/architect:5.3.0-09072f52a7b53b09d58bc867f138709101cf4123
-      volumes:
-        - ${{ github.workspace }}:/github/workspace
     env:
-      architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }} --update-changelog=false"
+      architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           ref: ${{ needs.gather_facts.outputs.branch }}
+      - name: Install architect
+        uses: giantswarm/install-binary-action@v1.0.0
+        with:
+          binary: "architect"
+          version: "5.3.0"
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
