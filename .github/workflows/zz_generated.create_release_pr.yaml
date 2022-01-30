@@ -82,13 +82,11 @@ jobs:
             version="${version#v}" # Strip "v" prefix.
           fi
           repo_name="$(echo '${{ github.repository }}' | awk -F '/' '{print $1}')"
-          parent_version="$(git describe --tags --abbrev=0 HEAD^ || true)"
           echo "repo_name=\"$repo_name\" base=\"$base\" head=\"$head\" version=\"$version\""
           echo "::set-output name=repo_name::${repo_name}"
           echo "::set-output name=base::${base}"
           echo "::set-output name=head::${head}"
           echo "::set-output name=version::${version}"
-          echo "::set-output name=parent_version::${parent_version}"
       - name: Check if PR exists
         id: pr_exists
         env:
@@ -115,14 +113,17 @@ jobs:
       changelog: ${{ steps.build_changelog.outputs.changelog }}
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Build changelog
       id: build_changelog
       run: |
+        parent_version="$(git describe --tags --abbrev=0 HEAD^ || true)"
         changelog=$(/go-changelog/changelog-build \
           -changelog-template /go-changelog/changelog.tmpl \
           -entries-dir .changelog \
-          -last-release ${{ needs.gather_facts.outputs.parent_version }} \
+          -last-release ${parent_version} \
           -note-template /go-changelog/release-note.tmpl \
           -this-release HEAD \
           -git-dir /github/workspace)
