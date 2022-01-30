@@ -140,7 +140,7 @@ jobs:
       - gather_facts
     if: ${{ needs.gather_facts.outputs.skip != 'true' }}
     container:
-      image: docker://giantswarm/architect:5.3.0-09072f52a7b53b09d58bc867f138709101cf4123
+      image: docker://quay.io/giantswarm/architect:5.3.0-09072f52a7b53b09d58bc867f138709101cf4123
       volumes:
         - ${{ github.workspace }}:/github/workspace
     env:
