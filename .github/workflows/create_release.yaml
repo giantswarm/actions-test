@@ -213,5 +213,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v${{ steps.get_version.outputs.version }}-irsa"
-          release_name: "v${{ steps.get_version.outputs.version }}-irsa"
+          tag_name: "v${{ needs.gather_facts.outputs.version }}-irsa"
+          release_name: "v${{ needs.gather_facts.outputs.version }}-irsa"
