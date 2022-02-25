@@ -195,7 +195,7 @@ jobs:
       - name: Create tag
         run: |
           git config --local user.name "github-actions"
-          git tag "v${{ needs.gather_facts.outputs.version }}-irsa" ${{ github.sha }}
+          git tag "v${{ needs.gather_facts.outputs.version }}-irsa"
       - name: Push tag
         env:
           REMOTE_REPO: "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
