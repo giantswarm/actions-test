@@ -175,8 +175,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.ref }}
-      - name: Create long-lived release branch
-        id: release_branch
+      - name: Update chart values
         run: |
           current_version="${{ needs.gather_facts.outputs.version }}"
           current_major=$(semver get major $current_version)
@@ -184,20 +183,15 @@ jobs:
 
           release_branch="release-v${current_major}.${current_minor}.x-irsa"
           echo "release_branch=$release_branch"
-          echo "::set-output name=release_branch::${release_branch}"
 
+          git config --local user.name "github-actions"
           git branch -fm $release_branch
-          git push -f origin $release_branch
-      - name: Update chart values
-        if: ${{ steps.release_branch.outputs.release_branch }}
-        run: |
           file="./helm/kiam-app/values.yaml"
           sed -i "s|# whiteListRouteRegexp: disabled by default|whiteListRouteRegexp: /latest/meta-data/placement/availability-zone|" ${file}
 
-          git config --local user.name "github-actions"
           git add ${file}
           git commit -m "Updated default values for IRSA"
-          git push origin ${{ steps.release_branch.outputs.release_branch }}
+          git push -f origin $release_branch
       - name: Create tag
         run: |
           git config --local user.name "github-actions"
