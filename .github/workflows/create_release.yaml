@@ -150,11 +150,8 @@ jobs:
             exit 0
           fi
 
-          git branch $release_branch HEAD^
+          git branch -fm $release_branch
           git push origin $release_branch
-
-
-
 
   create_irsa_release:
     name: Create IRSA release
@@ -189,7 +186,7 @@ jobs:
           echo "release_branch=$release_branch"
           echo "::set-output name=release_branch::${release_branch}"
 
-          git branch $release_branch HEAD^
+          git branch -fm $release_branch
           git push origin $release_branch
       - name: Update chart values
         if: ${{ steps.release_branch.outputs.release_branch }}
