@@ -1,0 +1,107 @@
+# Default values for kiam-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+name: kiam
+serviceType: "managed"
+
+# clusterID is dynamic environment value, calculated after cluster creation
+# applies only to Giant Swarm clusters
+clusterID: uun5a
+# provider is dynamic environment value, which comes from application catalog configuration
+# applies only to Giant Swarm clusters
+provider: aws
+
+agent:
+  name: kiam-agent
+
+  # agent is running as root as it needs to update iptables
+  userID: 0
+  groupID: 0
+
+  tlsSecret: kiam-agent-tls
+  tlsCerts:
+    certFileName: tls.crt
+    keyFileName: tls.key
+    caFileName: ca.crt
+
+  host:
+    port: 8181
+    interface: "!eth0"
+
+  gatewayTimeoutCreation: 500ms
+
+  log:
+    level: info
+    # Default gprc log level and verbosity, see https://github.com/grpc/grpc-go/blob/master/grpclog/loggerv2.go#L130
+    # Only change it to debug failing grpc calls, see https://github.com/uswitch/kiam/issues/115#issue-340009605
+    grpcLogLevel: error
+    grpcLogVerbosity: 0
+
+  prometheus:
+    scrape: true
+    port: 9620
+    syncInterval: 5s
+
+  resources:
+    limits:
+      memory: 50Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+
+  # agent whitelist of proxy routes matching this reg-ex
+  # whiteListRouteRegexp: disabled by default
+
+server:
+  name: kiam-server
+
+  userID: 65534
+  groupID: 65534
+
+  gatewayTimeoutCreation: 500ms
+
+  iam:
+    managed: true
+    # use only if not managed
+    assumeRoleARN: ""
+
+  cache:
+    syncInterval: 1m
+
+  tlsSecret: kiam-server-tls
+  tlsCerts:
+    certFileName: tls.crt
+    keyFileName: tls.key
+    caFileName: ca.crt
+
+  probes:
+    serverAddress: 127.0.0.1
+
+  log:
+    level: info
+
+  prometheus:
+    scrape: true
+    port: 9620
+    syncInterval: 5s
+
+  service:
+    port: 6443
+    targetPort: 6443
+
+  sessionDuration: 60m
+  sessionRefresh: 10m
+
+image:
+  name: giantswarm/kiam
+  tag: v4.2
+  pullPolicy: IfNotPresent
+
+global:
+  image:
+    registry: docker.io
+
+# placeholder, value taken from default-appcatalog-values.yaml
+kiam:
+  region: eu-central-1
