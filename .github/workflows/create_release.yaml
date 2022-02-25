@@ -76,7 +76,7 @@ jobs:
   update_project_go:
     name: Update project.go
     runs-on: ubuntu-20.04
-    if: ${{ needs.gather_facts.outputs.version != '' && needs.gather_facts.outputs.project_go_path != '' && needs.gather_facts.outputs.ref_version != 'true' }}
+    if: ${{ needs.gather_facts.outputs.version != '' && needs.gather_facts.outputs.ref_version != 'true' }}
     needs:
       - gather_facts
     steps:
