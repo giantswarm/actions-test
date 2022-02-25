@@ -187,7 +187,7 @@ jobs:
           echo "::set-output name=release_branch::${release_branch}"
 
           git branch -fm $release_branch
-          git push origin $release_branch
+          git push -f origin $release_branch
       - name: Update chart values
         if: ${{ steps.release_branch.outputs.release_branch }}
         run: |
