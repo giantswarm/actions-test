@@ -131,7 +131,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload generated changelog
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: changelog
         path: .changelog
