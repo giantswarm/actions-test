@@ -15,7 +15,7 @@ jobs:
     outputs:
       skip: ${{ steps.check.outputs.skip }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: Check PR body
         id: check
@@ -46,7 +46,7 @@ jobs:
     if: ${{ needs.go-changelog.outputs.skip != 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
 
       - name: Download changelog directory
         uses: actions/download-artifact@v2
